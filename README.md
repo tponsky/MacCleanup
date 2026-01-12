@@ -2,142 +2,237 @@
 
 A beautiful web-based file cleanup tool for your Mac. Automatically organizes, categorizes, and cleans up files across Desktop, Downloads, and Documents.
 
-## Features
+![MacCleanup Dashboard](https://img.shields.io/badge/status-active-success) ![Python](https://img.shields.io/badge/python-3.8+-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+
+## 🚀 Quick Download & Install
+
+### Option 1: DMG Installer (Recommended - Easiest!)
+
+1. **[Download MacCleanup-1.0.dmg](https://github.com/tponsky/MacCleanup/releases/latest/download/MacCleanup-1.0.dmg)**
+2. Double-click the DMG file
+3. Drag `MacCleanup.app` to your Applications folder
+4. Double-click `MacCleanup.app` to launch
+5. Your browser opens automatically at `http://localhost:5050`
+
+**First Launch:**
+- The app automatically installs Python dependencies (takes 1-2 minutes)
+- You'll see a notification when ready
+- **Configure your paths** (see Configuration below)
+
+---
+
+### Option 2: From Source
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/tponsky/MacCleanup.git
+   cd MacCleanup
+   ```
+
+2. **Set up Python environment:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **Run setup wizard (recommended for first time):**
+   ```bash
+   python3 setup_wizard.py
+   ```
+   This helps you configure Dropbox/iCloud and external drive paths.
+
+4. **Or launch directly:**
+   ```bash
+   ./start.sh
+   ```
+
+---
+
+## ⚙️ Configuration (Important!)
+
+**MacCleanup needs to know where your files are stored!**
+
+### Quick Configuration:
+
+Run the setup wizard:
+```bash
+python3 setup_wizard.py
+```
+
+### Manual Configuration:
+
+1. Open `config.py` in a text editor
+2. Update these paths:
+   - `DROPBOX_ROOT`: Your Dropbox folder path
+   - `SSD_ROOT`: Your external drive path (or set to `None` if you don't use one)
+
+**Example configurations:**
+
+```python
+# Using Dropbox
+DROPBOX_ROOT = HOME / "Dropbox" / "Your Name"
+
+# Using iCloud Drive
+DROPBOX_ROOT = HOME / "Library" / "Mobile Documents" / "com~apple~CloudDocs"
+
+# No cloud storage
+DROPBOX_ROOT = None
+
+# External drive
+SSD_ROOT = Path("/Volumes/My External Drive")
+
+# No external drive
+SSD_ROOT = None
+```
+
+**For DMG users:** Right-click `MacCleanup.app` → Show Package Contents → Contents/Resources/config.py
+
+---
+
+## ✨ Features
 
 - **Visual Dashboard** - See file statistics at a glance
 - **Smart Categorization** - Automatically identifies file types
 - **One-Click Cleanup** - Delete junk, move files to proper locations
-- **Dropbox Integration** - Organizes files into your Dropbox structure
+- **Selectable Actions** - Checkboxes to choose what to clean
+- **Dropbox/iCloud Integration** - Organizes files into your cloud storage
 - **SSD Support** - Moves large videos to your external SSD
+- **Version Detection** - Identifies latest versions of duplicate files
 - **Scheduled Runs** - Automatically cleans up weekly
-- **Duplicate Detection** - Finds files with (1), (2), copy, etc.
+- **Archive Old Files** - Moves files older than 30-90 days to archive
 
-## Quick Start
+---
 
-### Option 1: Use the App (Recommended)
-1. Find **MacCleanup.app** in `/Users/toddponskymd/Applications/`
-2. Drag it to your Dock for easy access
-3. Click to launch - browser opens automatically
+## 📖 How It Works
 
-### Option 2: Run from Terminal
-```bash
-cd ~/CursorProjects/MacCleanup
-./start.sh
-```
+### What Gets Cleaned
 
-### Option 3: Run Cleanup Without GUI
-```bash
-cd ~/CursorProjects/MacCleanup
-source venv/bin/activate
-python3 auto_cleanup.py
-```
+**Automatically Deleted:**
+- Office temp files (`~$*.pptx`)
+- `.DS_Store` files
+- Installer files (`.dmg`, `.pkg`)
 
-## Setting Up Automatic Weekly Cleanup
+**Automatically Moved:**
+- Presentations → `Dropbox/Work/Presentations/`
+- PDFs → `Dropbox/Reference/PDFs/`
+- Screenshots → `Dropbox/Media/Screenshots/`
+- Videos → External SSD (if configured)
 
-Run this once to schedule automatic cleanup every Monday at 9 AM:
+**Archived (Old Files):**
+- Screenshots >30 days → `Dropbox/Media/Screenshots/Archive/`
+- Files >90 days → `Dropbox/Archive/`
+
+---
+
+## 🎯 Usage
+
+1. **Launch the app** (click `MacCleanup.app` or run `./start.sh`)
+2. **Open your browser** at `http://localhost:5050`
+3. **Click "Preview Cleanup"** to see suggested actions
+4. **Select/deselect** actions using checkboxes
+5. **Click "Run Cleanup"** to execute selected actions
+
+---
+
+## ⏰ Automatic Cleanup
+
+Set up weekly automatic cleanup:
 
 ```bash
 cd ~/CursorProjects/MacCleanup
 ./setup_scheduler.sh
 ```
 
-To disable automatic cleanup:
+This runs cleanup every Monday at 9:00 AM automatically.
+
+To disable:
 ```bash
 launchctl unload ~/Library/LaunchAgents/com.maccleanup.auto.plist
 ```
 
-## What Gets Cleaned
+---
 
-### Automatically Deleted
-- Office temp files (`~$*.pptx`, `~$*.docx`)
-- `.DS_Store` files
-- Temp files (`*.tmp`)
-- Old installers (`.dmg`, `.pkg` in Downloads)
+## 📁 Folder Structure
 
-### Automatically Moved to Dropbox
-- Presentations → `Dropbox/Work/Presentations/`
-- PDFs → `Dropbox/Reference/PDFs/`
-- Screenshots → `Dropbox/Media/Screenshots/`
-- Old files → `Dropbox/Archive/`
-
-### Automatically Moved to SSD (if connected)
-- Video files → `SSD/Videos/To-Review/`
-
-### Flagged for Review
-- Files larger than 100MB
-- Potential duplicates
-- Files older than 90 days
-
-## Folder Structure
-
-Your files are organized into:
+Files are organized into:
 
 ```
-~/GlobalCastMD Dropbox/Todd Ponsky/
+Dropbox/
 ├── Work/
-│   ├── CCHMC/
-│   ├── GlobalCastMD/
-│   └── Presentations/
-├── Projects/
+│   ├── Presentations/
+│   └── Documents/
 ├── Reference/PDFs/
 ├── Media/
 │   ├── Videos/
 │   └── Screenshots/
 └── Archive/
 
-/Volumes/Extreme SSD/
+External SSD/
 ├── Videos/
 │   ├── AI-Demos/
 │   ├── Presentations/
-│   ├── Personal/
-│   ├── Work-Projects/
 │   └── To-Review/
 └── Final-Cut-Projects/
 ```
 
-## Customization
+---
 
-Edit `config.py` to customize:
-- Watched directories
-- File categories
-- Age thresholds
-- Size thresholds
-- Destination folders
+## 🛠️ Troubleshooting
 
-## Troubleshooting
+### Port 5050 already in use
+- Close other apps using port 5050
+- Or edit `app.py` and change `port=5050` to a different number
 
-**App won't open?**
-- Right-click → Open (first time only, bypasses Gatekeeper)
+### Dropbox not found
+- Make sure Dropbox is installed and running
+- Update `DROPBOX_ROOT` in `config.py` to match your Dropbox path
+- Or use the setup wizard: `python3 setup_wizard.py`
 
-**Dropbox not detected?**
-- Make sure Dropbox is running and synced
-
-**SSD not detected?**
-- Connect your "Extreme SSD" drive
-
-**Need to see logs?**
+### Permission denied
 ```bash
-cat /tmp/maccleanup.log
-cat /tmp/maccleanup.error.log
+chmod +x start.sh setup_scheduler.sh auto_cleanup.py
 ```
+
+### App won't open (Gatekeeper)
+- Right-click `MacCleanup.app` → Open → Click "Open" in the dialog
 
 ---
 
-Made with ❤️ for Todd's MacBook
+## 📚 Documentation
 
-## Sharing with Others
+- **[INSTALLATION.md](INSTALLATION.md)** - Detailed installation guide
+- **[SHARING.md](SHARING.md)** - How to share with others
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Deployment options
+- **[ARCHIVING_EXPLAINED.md](ARCHIVING_EXPLAINED.md)** - How archiving works
 
-Want to share MacCleanup with friends or colleagues?
+---
+
+## 🤝 Sharing with Others
 
 **Easiest way:** Share the GitHub link: https://github.com/tponsky/MacCleanup
 
-They can:
-1. Clone the repo
-2. Follow [INSTALLATION.md](INSTALLATION.md)
-3. Start using it!
+Or share the DMG installer from [Releases](https://github.com/tponsky/MacCleanup/releases).
 
-**For non-technical users:** See [SHARING.md](SHARING.md) for instructions on creating a DMG installer.
+See [SHARING.md](SHARING.md) for more details.
+
+---
+
+## 📝 Requirements
+
+- macOS 10.13 or later
+- Python 3.8+ (usually pre-installed on Mac)
+- Dropbox (optional, but recommended)
+- External SSD (optional, for large video files)
+
+---
+
+## 📄 License
+
+MIT License - feel free to use and modify!
 
 ---
 
 **Repository:** https://github.com/tponsky/MacCleanup
+
+**Made with ❤️ for organized file management**

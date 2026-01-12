@@ -1,9 +1,20 @@
 """Configuration for MacCleanup app"""
 import os
+import json
 from pathlib import Path
 
 # User home directory
 HOME = Path.home()
+
+# Load user configuration if it exists
+USER_CONFIG_FILE = Path(__file__).parent / "user_config.json"
+user_config = {}
+if USER_CONFIG_FILE.exists():
+    try:
+        with open(USER_CONFIG_FILE, 'r') as f:
+            user_config = json.load(f)
+    except:
+        pass
 
 # Directories to monitor and clean
 WATCHED_DIRS = {
@@ -12,28 +23,36 @@ WATCHED_DIRS = {
     "documents": HOME / "Documents",
 }
 
-# Dropbox path
-DROPBOX_ROOT = HOME / "GlobalCastMD Dropbox" / "Todd Ponsky"
+# Dropbox path - use user config or default
+if user_config.get('dropbox_root'):
+    DROPBOX_ROOT = Path(user_config['dropbox_root'])
+else:
+    # Default - can be overridden by user
+    DROPBOX_ROOT = HOME / "GlobalCastMD Dropbox" / "Todd Ponsky"
 
-# External SSD path
-SSD_ROOT = Path("/Volumes/Extreme SSD")
+# External SSD path - use user config or default
+if user_config.get('ssd_root'):
+    SSD_ROOT = Path(user_config['ssd_root'])
+else:
+    # Default - can be overridden by user
+    SSD_ROOT = Path("/Volumes/Extreme SSD")
 
-# Dropbox folder structure
+# Dropbox folder structure (only if Dropbox exists)
 DROPBOX_FOLDERS = {
     "presentations": DROPBOX_ROOT / "Work" / "Presentations",
     "pdfs": DROPBOX_ROOT / "Reference" / "PDFs",
     "documents": DROPBOX_ROOT / "Work",
     "screenshots": DROPBOX_ROOT / "Media" / "Screenshots",
     "archive": DROPBOX_ROOT / "Archive",
-}
+} if DROPBOX_ROOT.exists() else {}
 
-# SSD folder structure
+# SSD folder structure (only if SSD exists)
 SSD_FOLDERS = {
     "videos": SSD_ROOT / "Videos" / "To-Review",
     "ai_demos": SSD_ROOT / "Videos" / "AI-Demos",
     "presentations": SSD_ROOT / "Videos" / "Presentations",
     "personal": SSD_ROOT / "Videos" / "Personal",
-}
+} if SSD_ROOT.exists() else {}
 
 # File categories and their extensions
 FILE_CATEGORIES = {

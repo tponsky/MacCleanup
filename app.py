@@ -968,6 +968,14 @@ def api_cleanup():
 
 
 if __name__ == '__main__':
+    # Check if first run - suggest running setup wizard
+    USER_CONFIG_FILE = Path(__file__).parent / "user_config.json"
+    if not USER_CONFIG_FILE.exists():
+        print("⚠️  First time setup recommended!")
+        print("   Run: python3 setup_wizard.py")
+        print("   Or edit config.py to customize paths")
+        print()
+    
     print("🧹 MacCleanup is running!")
     print("   Open http://localhost:5050 in your browser")
     print("   Press Ctrl+C to stop")
