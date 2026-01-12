@@ -1,0 +1,315 @@
+# Setup Template - This will be added to app.py
+# Comprehensive web-based setup wizard matching the existing UI style
+
+SETUP_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacCleanup - Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --accent: #e94560;
+            --accent-light: #ff6b6b;
+            --success: #00d9a5;
+            --warning: #ffc93c;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --border: rgba(255,255,255,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .setup-container {
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .setup-card {
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h1::before {
+            content: "🧹";
+            -webkit-text-fill-color: initial;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .detected-path {
+            background: rgba(0, 217, 165, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--success);
+        }
+        
+        .no-path {
+            background: rgba(255, 201, 60, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--warning);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(233, 69, 96, 0.5);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+        
+        .error {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            color: var(--accent-light);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="setup-card">
+            <h1>MacCleanup</h1>
+            <p class="subtitle">First-time Setup - Let's configure your file organization</p>
+            
+            <form id="setupForm">
+                <div class="form-group">
+                    <label for="dropboxPath">Dropbox Folder</label>
+                    <input type="text" id="dropboxPath" name="dropboxPath" placeholder="/Users/YourName/Dropbox">
+                    <div class="form-help">MacCleanup will organize files into your Dropbox. Leave empty if you don't use Dropbox.</div>
+                    <div id="dropboxStatus"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ssdPath">External Drive (Optional)</label>
+                    <select id="ssdPath" name="ssdPath">
+                        <option value="">None - No external drive</option>
+                    </select>
+                    <div class="form-help">Large files (videos) will be moved to your external drive. Only shown if a drive is detected.</div>
+                    <div class="checkbox-group" id="ssdAlwaysConnectedGroup" style="display: none;">
+                        <input type="checkbox" id="ssdAlwaysConnected" name="ssdAlwaysConnected">
+                        <label for="ssdAlwaysConnected" style="margin: 0;">Drive is always connected (storage only)</label>
+                    </div>
+                    <div id="ssdStatus"></div>
+                </div>
+                
+                <div class="error" id="error"></div>
+                <div class="loading" id="loading">Saving configuration...</div>
+                
+                <button type="submit" class="btn btn-primary" id="saveBtn">Save Configuration</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-detect paths when page loads
+        async function detectPaths() {
+            try {
+                const response = await fetch('/api/setup/detect');
+                const data = await response.json();
+                
+                // Set Dropbox path if detected
+                if (data.dropbox) {
+                    document.getElementById('dropboxPath').value = data.dropbox;
+                    document.getElementById('dropboxStatus').innerHTML = 
+                        '<div class="detected-path">✓ Detected: ' + data.dropbox + '</div>';
+                } else {
+                    document.getElementById('dropboxStatus').innerHTML = 
+                        '<div class="no-path">No Dropbox detected. You can enter the path manually or leave empty.</div>';
+                }
+                
+                // Set external drives if detected
+                const ssdSelect = document.getElementById('ssdPath');
+                if (data.drives && data.drives.length > 0) {
+                    ssdSelect.innerHTML = '<option value="">None - No external drive</option>';
+                    data.drives.forEach(drive => {
+                        const option = document.createElement('option');
+                        option.value = '/Volumes/' + drive;
+                        option.textContent = drive;
+                        ssdSelect.appendChild(option);
+                    });
+                    document.getElementById('ssdAlwaysConnectedGroup').style.display = 'flex';
+                } else {
+                    ssdSelect.innerHTML = '<option value="">None - No external drive detected</option>';
+                    document.getElementById('ssdAlwaysConnectedGroup').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error detecting paths:', error);
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const dropboxPath = document.getElementById('dropboxPath').value.trim();
+            const ssdPath = document.getElementById('ssdPath').value;
+            const ssdAlwaysConnected = document.getElementById('ssdAlwaysConnected').checked;
+            
+            const errorDiv = document.getElementById('error');
+            const loadingDiv = document.getElementById('loading');
+            const saveBtn = document.getElementById('saveBtn');
+            
+            errorDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            saveBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/setup/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        dropbox_root: dropboxPath || null,
+                        ssd_root: ssdPath || null,
+                        ssd_always_connected: ssdAlwaysConnected,
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Redirect to main dashboard
+                    window.location.href = '/';
+                } else {
+                    throw new Error(data.message || 'Failed to save configuration');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.style.display = 'block';
+                loadingDiv.style.display = 'none';
+                saveBtn.disabled = false;
+            }
+        });
+        
+        // Detect paths on page load
+        detectPaths();
+    </script>
+</body>
+</html>
+'''
