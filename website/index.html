@@ -26,7 +26,7 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             padding: 60px 40px;
             text-align: center;
@@ -50,15 +50,11 @@
             margin-bottom: 40px;
         }
 
-        .description {
-            font-size: 18px;
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 50px;
-            text-align: left;
+        .download-section {
             background: #f8f9fa;
-            padding: 30px;
             border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
         }
 
         .download-button {
@@ -72,7 +68,7 @@
             text-decoration: none;
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
             transition: transform 0.2s, box-shadow 0.2s;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .download-button:hover {
@@ -80,14 +76,90 @@
             box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
         }
 
-        .download-button:active {
-            transform: translateY(0);
-        }
-
         .download-size {
             font-size: 14px;
             color: #999;
             margin-top: 10px;
+        }
+
+        .note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .instructions {
+            text-align: left;
+            margin-top: 40px;
+        }
+
+        .instructions h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .instructions h3 {
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .instructions ol, .instructions ul {
+            margin-left: 25px;
+            line-height: 2;
+            color: #555;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        .instructions code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .step-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .step-box h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+
+        .step-box ol {
+            color: #856404;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .info-box h3 {
+            color: #0c5460;
+            margin-top: 0;
+        }
+
+        .info-box p {
+            color: #0c5460;
+            line-height: 1.8;
         }
 
         .features {
@@ -117,7 +189,7 @@
         }
 
         .github-link {
-            margin-top: 40px;
+            margin-top: 50px;
             padding-top: 40px;
             border-top: 1px solid #e0e0e0;
         }
@@ -130,31 +202,6 @@
 
         .github-link a:hover {
             text-decoration: underline;
-        }
-
-        .instructions {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 12px;
-            padding: 25px;
-            margin-top: 40px;
-            text-align: left;
-        }
-
-        .instructions h3 {
-            color: #856404;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        .instructions ol {
-            margin-left: 20px;
-            color: #856404;
-            line-height: 2;
-        }
-
-        .instructions li {
-            margin-bottom: 10px;
         }
 
         @media (max-width: 600px) {
@@ -183,48 +230,116 @@
         <h1>MacCleanup</h1>
         <p class="subtitle">File Organization Tool for macOS</p>
 
-        <div class="description">
-            <p>MacCleanup is a beautiful web-based file cleanup tool that automatically organizes, categorizes, and cleans up files across your Desktop, Downloads, and Documents folders.</p>
-            <p style="margin-top: 15px;">Keep your Mac organized with smart file management, automatic cleanup, and cloud storage integration.</p>
-        </div>
+        <div class="download-section">
+            <div class="note">
+                <strong>📥 Download & Install:</strong> This is a standalone Mac app. Once downloaded and installed, it runs entirely on your Mac. No server, no cloud, just your files on your computer.
+            </div>
 
-        <a href="MacCleanup-1.0.dmg" class="download-button" download>
-            📥 Download MacCleanup
-        </a>
-        <div class="download-size">DMG Installer • macOS 10.13+</div>
+            <a href="MacCleanup-1.0.dmg" class="download-button" download>
+                📥 Download MacCleanup
+            </a>
+            <div class="download-size">DMG Installer • macOS 10.13+ • Runs Locally on Your Mac</div>
+        </div>
 
         <div class="instructions">
-            <h3>📋 Quick Install Guide</h3>
-            <ol>
-                <li>Download the DMG file above</li>
-                <li>Double-click to open the DMG</li>
-                <li>Drag MacCleanup.app to your Applications folder</li>
-                <li>Double-click MacCleanup.app to launch</li>
-                <li>Configure your Dropbox/iCloud paths (see documentation)</li>
-            </ol>
-        </div>
+            <h2>📋 Installation & Setup Guide</h2>
 
-        <div class="features">
-            <div class="feature">
-                <h3>🎯 Smart Organization</h3>
-                <p>Automatically categorizes and organizes files into the right folders.</p>
+            <div class="step-box">
+                <h3>Step 1: Install the App</h3>
+                <ol>
+                    <li>Download the DMG file above</li>
+                    <li>Double-click <code>MacCleanup-1.0.dmg</code> to open it</li>
+                    <li>Drag <code>MacCleanup.app</code> to your <strong>Applications</strong> folder</li>
+                    <li>Double-click <code>MacCleanup.app</code> to launch it</li>
+                </ol>
             </div>
-            <div class="feature">
-                <h3>🗑️ Auto Cleanup</h3>
-                <p>Deletes junk files and archives old files automatically.</p>
-            </div>
-            <div class="feature">
-                <h3>☁️ Cloud Integration</h3>
-                <p>Works with Dropbox and iCloud Drive seamlessly.</p>
-            </div>
-            <div class="feature">
-                <h3>📊 Visual Dashboard</h3>
-                <p>Web-based interface for easy file management.</p>
-            </div>
-        </div>
 
-        <div class="github-link">
-            <a href="https://github.com/tponsky/MacCleanup" target="_blank">📚 View Documentation on GitHub →</a>
+            <div class="step-box">
+                <h3>Step 2: First-Time Configuration</h3>
+                <ol>
+                    <li><strong>Right-click</strong> <code>MacCleanup.app</code> → <strong>Show Package Contents</strong></li>
+                    <li>Navigate to: <code>Contents/Resources/</code></li>
+                    <li>Open Terminal in that folder:
+                        <code style="display: block; margin-top: 10px; padding: 10px; background: #f4f4f4; border-radius: 4px;">cd /Applications/MacCleanup.app/Contents/Resources<br>python3 setup_wizard.py</code>
+                    </li>
+                    <li>The wizard will:
+                        <ul>
+                            <li>Detect your Dropbox folder (if you have one)</li>
+                            <li>Detect your external drives (if any)</li>
+                            <li>Ask you to configure paths</li>
+                            <li>Save your configuration</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h3>⚙️ Configuration Options</h3>
+                <p><strong>You can use:</strong></p>
+                <ul>
+                    <li>Dropbox (detected automatically)</li>
+                    <li>iCloud Drive (select in wizard)</li>
+                    <li>No cloud storage (works fine locally)</li>
+                    <li>External drives (detected automatically, optional)</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>The app organizes YOUR files on YOUR Mac.</strong> It doesn't access anyone else's files or any server.</p>
+            </div>
+
+            <div class="step-box">
+                <h3>Step 3: Launch & Use</h3>
+                <ol>
+                    <li>Double-click <code>MacCleanup.app</code> to launch</li>
+                    <li>Your browser opens automatically at <code>http://localhost:5050</code></li>
+                    <li>Click <strong>"Preview Cleanup"</strong> to see suggested actions</li>
+                    <li>Select/deselect actions using checkboxes</li>
+                    <li>Click <strong>"Run Cleanup"</strong> to execute selected actions</li>
+                </ol>
+            </div>
+
+            <h3>🔄 Using MacCleanup in the Future</h3>
+            <div class="info-box">
+                <p><strong>Every time you want to clean up your files:</strong></p>
+                <ol>
+                    <li>Double-click <code>MacCleanup.app</code> in your Applications folder</li>
+                    <li>Your browser opens at <code>http://localhost:5050</code></li>
+                    <li>Click "Preview Cleanup" to see what needs organizing</li>
+                    <li>Review the suggestions</li>
+                    <li>Select the actions you want (using checkboxes)</li>
+                    <li>Click "Run Cleanup" to execute</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>That's it!</strong> The app runs locally on your Mac - no internet connection needed, no server, just your files.</p>
+            </div>
+
+            <h3>⏰ Optional: Automatic Weekly Cleanup</h3>
+            <p>To set up automatic cleanup every Monday at 9 AM:</p>
+            <code style="display: block; margin: 10px 0; padding: 10px; background: #f4f4f4; border-radius: 4px;">
+                cd /Applications/MacCleanup.app/Contents/Resources<br>
+                ./setup_scheduler.sh
+            </code>
+            <p style="margin-top: 15px; color: #666;">This is completely optional. You can always run the app manually instead.</p>
+
+            <div class="features">
+                <div class="feature">
+                    <h3>🎯 Smart Organization</h3>
+                    <p>Automatically categorizes and organizes files into the right folders.</p>
+                </div>
+                <div class="feature">
+                    <h3>🗑️ Auto Cleanup</h3>
+                    <p>Deletes junk files and archives old files automatically.</p>
+                </div>
+                <div class="feature">
+                    <h3>☁️ Cloud Integration</h3>
+                    <p>Works with Dropbox and iCloud Drive seamlessly.</p>
+                </div>
+                <div class="feature">
+                    <h3>📊 Visual Dashboard</h3>
+                    <p>Web-based interface for easy file management.</p>
+                </div>
+            </div>
+
+            <div class="github-link">
+                <a href="https://github.com/tponsky/MacCleanup" target="_blank">📚 View Full Documentation on GitHub →</a>
+            </div>
         </div>
     </div>
 </body>
