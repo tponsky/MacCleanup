@@ -119,6 +119,19 @@ Visit: https://github.com/tponsky/MacCleanup
 Enjoy your organized files! 🧹
 README
 
+# Code-sign the app
+CODESIGN_IDENTITY="Developer ID Application: Bobbin LLC (8YY98N4P3K)"
+echo "Code-signing the app..."
+codesign --deep --force --verify --verbose \
+  --sign "${CODESIGN_IDENTITY}" \
+  "${APP_BUNDLE}"
+
+if [ $? -eq 0 ]; then
+    echo "✅ App code-signed successfully"
+else
+    echo "⚠️  Warning: Code signing failed, but continuing..."
+fi
+
 # Create DMG
 echo "Creating DMG file..."
 hdiutil create -volname "${APP_NAME}" -srcfolder "${TEMP_DIR}" -ov -format UDZO "${DMG_NAME}"
