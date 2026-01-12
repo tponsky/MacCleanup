@@ -122,6 +122,9 @@ README
 # Code-sign the app
 CERT_HASH="C1169D74637BC4423A446131BD9087422E2AEF66"
 echo "Code-signing the app..."
+# Remove extended attributes before signing
+xattr -cr "${APP_BUNDLE}"
+# Sign the app
 codesign --deep --force --options runtime --timestamp \
   --sign "${CERT_HASH}" \
   "${APP_BUNDLE}"
