@@ -124,3 +124,20 @@ cat /tmp/maccleanup.error.log
 ---
 
 Made with ❤️ for Todd's MacBook
+
+## Sharing with Others
+
+Want to share MacCleanup with friends or colleagues?
+
+**Easiest way:** Share the GitHub link: https://github.com/tponsky/MacCleanup
+
+They can:
+1. Clone the repo
+2. Follow [INSTALLATION.md](INSTALLATION.md)
+3. Start using it!
+
+**For non-technical users:** See [SHARING.md](SHARING.md) for instructions on creating a DMG installer.
+
+---
+
+**Repository:** https://github.com/tponsky/MacCleanup
