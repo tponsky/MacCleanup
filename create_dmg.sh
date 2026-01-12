@@ -120,10 +120,10 @@ Enjoy your organized files! 🧹
 README
 
 # Code-sign the app
-CODESIGN_IDENTITY="Developer ID Application: Bobbin LLC (8YY98N4P3K)"
+CERT_HASH="C1169D74637BC4423A446131BD9087422E2AEF66"
 echo "Code-signing the app..."
-codesign --deep --force --verify --verbose \
-  --sign "${CODESIGN_IDENTITY}" \
+codesign --deep --force --options runtime --timestamp \
+  --sign "${CERT_HASH}" \
   "${APP_BUNDLE}"
 
 if [ $? -eq 0 ]; then
