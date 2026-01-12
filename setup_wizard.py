@@ -123,22 +123,41 @@ def main():
     drives = detect_external_drives()
     if drives:
         print(f"   Found: {', '.join(drives)}")
-        use_drive = input(f"   Use external drive for large files? (Y/n): ").strip().lower()
+        print()
+        print("   If you want to use an external drive, please make sure it's plugged in now.")
+        use_drive = input(f"   Use external drive for large files (videos, etc.)? (Y/n): ").strip().lower()
         if use_drive != 'n':
             if len(drives) == 1:
-                config['ssd_root'] = f"/Volumes/{drives[0]}"
+                selected_drive = drives[0]
+                config['ssd_root'] = f"/Volumes/{selected_drive}"
                 print(f"   Using: {config['ssd_root']}")
             else:
                 print("   Available drives:")
                 for i, drive in enumerate(drives, 1):
                     print(f"   {i}. {drive}")
                 choice = get_user_input(f"   Select drive (1-{len(drives)})", validator=lambda x: x.isdigit() and 1 <= int(x) <= len(drives))
-                config['ssd_root'] = f"/Volumes/{drives[int(choice)-1]}"
+                selected_drive = drives[int(choice)-1]
+                config['ssd_root'] = f"/Volumes/{selected_drive}"
+            
+            print()
+            print("   Important: Will this drive always be plugged in?")
+            print("   - Always connected (storage only): App will move files here")
+            print("   - Sometimes disconnected (active use): App will ask before moving files")
+            drive_always = input(f"   Will '{selected_drive}' always be connected? (Y/n): ").strip().lower()
+            config['ssd_always_connected'] = (drive_always != 'n')
+            
+            if config['ssd_always_connected']:
+                print(f"   ✓ Drive will always be connected - files can be moved automatically")
+            else:
+                print(f"   ⚠ Drive may be disconnected - app will ask before moving files")
         else:
             config['ssd_root'] = None
+            config['ssd_always_connected'] = False
     else:
         print("   No external drives found")
+        print("   💡 Tip: If you have an external drive, plug it in and run this wizard again")
         config['ssd_root'] = None
+        config['ssd_always_connected'] = False
     
     print()
     

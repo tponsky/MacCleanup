@@ -33,9 +33,11 @@ else:
 # External SSD path - use user config or default
 if user_config.get('ssd_root'):
     SSD_ROOT = Path(user_config['ssd_root'])
+    SSD_ALWAYS_CONNECTED = user_config.get('ssd_always_connected', True)
 else:
     # Default - can be overridden by user
     SSD_ROOT = Path("/Volumes/Extreme SSD")
+    SSD_ALWAYS_CONNECTED = True  # Default assumes always connected
 
 # Dropbox folder structure (only if Dropbox exists)
 DROPBOX_FOLDERS = {
