@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacCleanup - File Organization Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .description {
+            font-size: 18px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 50px;
+            text-align: left;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .download-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            padding: 20px 50px;
+            border-radius: 12px;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 30px;
+        }
+
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .download-button:active {
+            transform: translateY(0);
+        }
+
+        .download-size {
+            font-size: 14px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 50px;
+            text-align: left;
+        }
+
+        .feature {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .feature h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .feature p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .github-link {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .github-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .github-link a:hover {
+            text-decoration: underline;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #856404;
+            line-height: 2;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .download-button {
+                font-size: 20px;
+                padding: 18px 40px;
+            }
+
+            .container {
+                padding: 40px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🧹</div>
+        <h1>MacCleanup</h1>
+        <p class="subtitle">File Organization Tool for macOS</p>
+
+        <div class="description">
+            <p>MacCleanup is a beautiful web-based file cleanup tool that automatically organizes, categorizes, and cleans up files across your Desktop, Downloads, and Documents folders.</p>
+            <p style="margin-top: 15px;">Keep your Mac organized with smart file management, automatic cleanup, and cloud storage integration.</p>
+        </div>
+
+        <a href="MacCleanup-1.0.dmg" class="download-button" download>
+            📥 Download MacCleanup
+        </a>
+        <div class="download-size">DMG Installer • macOS 10.13+</div>
+
+        <div class="instructions">
+            <h3>📋 Quick Install Guide</h3>
+            <ol>
+                <li>Download the DMG file above</li>
+                <li>Double-click to open the DMG</li>
+                <li>Drag MacCleanup.app to your Applications folder</li>
+                <li>Double-click MacCleanup.app to launch</li>
+                <li>Configure your Dropbox/iCloud paths (see documentation)</li>
+            </ol>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>🎯 Smart Organization</h3>
+                <p>Automatically categorizes and organizes files into the right folders.</p>
+            </div>
+            <div class="feature">
+                <h3>🗑️ Auto Cleanup</h3>
+                <p>Deletes junk files and archives old files automatically.</p>
+            </div>
+            <div class="feature">
+                <h3>☁️ Cloud Integration</h3>
+                <p>Works with Dropbox and iCloud Drive seamlessly.</p>
+            </div>
+            <div class="feature">
+                <h3>📊 Visual Dashboard</h3>
+                <p>Web-based interface for easy file management.</p>
+            </div>
+        </div>
+
+        <div class="github-link">
+            <a href="https://github.com/tponsky/MacCleanup" target="_blank">📚 View Documentation on GitHub →</a>
+        </div>
+    </div>
+</body>
+</html>
