@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacCleanup - File Organization Tool</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
         * {
             margin: 0;
@@ -242,81 +243,80 @@
         </div>
 
         <div class="instructions">
-            <h2>📋 Installation & Setup Guide</h2>
+            <h2>📋 Simple Installation Guide</h2>
 
             <div class="step-box">
-                <h3>Step 1: Install the App</h3>
+                <h3>Step 1: Download</h3>
+                <p style="color: #856404; margin-bottom: 1rem;">Click the download button above to get the MacCleanup DMG file.</p>
+            </div>
+
+            <div class="step-box">
+                <h3>Step 2: Drag to Applications</h3>
                 <ol>
-                    <li>Download the DMG file above</li>
-                    <li>Double-click <code>MacCleanup-1.0.dmg</code> to open it</li>
-                    <li>Drag <code>MacCleanup.app</code> to your <strong>Applications</strong> folder</li>
+                    <li>Double-click the downloaded <code>MacCleanup-1.0.dmg</code> file to open it</li>
+                    <li>You'll see a window with <code>MacCleanup.app</code> and an <code>Applications</code> folder</li>
+                    <li>Drag <code>MacCleanup.app</code> to the <code>Applications</code> folder</li>
+                </ol>
+                <div style="text-align: center; margin: 20px 0;">
+                    <img src="drag-to-applications.png" alt="Drag MacCleanup.app to Applications folder" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3>Step 3: Open from Applications</h3>
+                <ol>
+                    <li>Open your <code>Applications</code> folder</li>
                     <li>Double-click <code>MacCleanup.app</code> to launch it</li>
+                    <li>Your browser will automatically open</li>
                 </ol>
             </div>
 
             <div class="step-box">
-                <h3>Step 2: First-Time Configuration</h3>
+                <h3>Step 4: Setup Preferences</h3>
+                <p style="color: #856404; margin-bottom: 1rem;">A setup page will open asking for your preferences:</p>
+                <ul>
+                    <li><strong>Preferred cloud storage</strong> (Dropbox, iCloud, Google Drive, OneDrive, or None)</li>
+                    <li><strong>What storage you're already using</strong> (select all that apply)</li>
+                    <li><strong>External SSD</strong> (if you have one - detected automatically)</li>
+                    <li><strong>Default starting page</strong> (Cleanup Dashboard or Setup Page)</li>
+                </ul>
+                <p style="margin-top: 1rem; color: #856404;">Answer the questions and click <strong>"Save Configuration"</strong>.</p>
+            </div>
+
+            <div class="step-box">
+                <h3>Step 5: Start Cleaning Up</h3>
+                <p style="color: #856404; margin-bottom: 1rem;">Once setup is complete, you can:</p>
                 <ol>
-                    <li><strong>Right-click</strong> <code>MacCleanup.app</code> → <strong>Show Package Contents</strong></li>
-                    <li>Navigate to: <code>Contents/Resources/</code></li>
-                    <li>Open Terminal in that folder:
-                        <code style="display: block; margin-top: 10px; padding: 10px; background: #f4f4f4; border-radius: 4px;">cd /Applications/MacCleanup.app/Contents/Resources<br>python3 setup_wizard.py</code>
-                    </li>
-                    <li>The wizard will:
-                        <ul>
-                            <li>Detect your Dropbox folder (if you have one)</li>
-                            <li>Detect your external drives (if any)</li>
-                            <li>Ask you to configure paths</li>
-                            <li>Save your configuration</li>
-                        </ul>
-                    </li>
+                    <li>Click <strong>"Preview Cleanup"</strong> to see suggested actions</li>
+                    <li>Review files that should be deleted, moved, or archived</li>
+                    <li>Select the actions you want (using checkboxes)</li>
+                    <li>Click <strong>"Run Cleanup"</strong> to execute</li>
                 </ol>
             </div>
 
             <div class="info-box">
-                <h3>⚙️ Configuration Options</h3>
-                <p><strong>You can use:</strong></p>
+                <h3>⚙️ What MacCleanup Does</h3>
+                <p style="margin-bottom: 1rem;"><strong>This app helps you:</strong></p>
                 <ul>
-                    <li>Dropbox (detected automatically)</li>
-                    <li>iCloud Drive (select in wizard)</li>
-                    <li>No cloud storage (works fine locally)</li>
-                    <li>External drives (detected automatically, optional)</li>
+                    <li>Look at all your files and suggest files that should be deleted</li>
+                    <li>Identify old versions that could be archived</li>
+                    <li>Create folders with a better workflow</li>
+                    <li>Come up with a storage strategy using your Desktop, external drives, and cloud storage</li>
                 </ul>
-                <p style="margin-top: 15px;"><strong>The app organizes YOUR files on YOUR Mac.</strong> It doesn't access anyone else's files or any server.</p>
+                <p style="margin-top: 15px;"><strong>The app organizes YOUR files on YOUR Mac.</strong> It doesn't access anyone else's files or any server. Everything runs locally on your computer.</p>
             </div>
 
-            <div class="step-box">
-                <h3>Step 3: Launch & Use</h3>
-                <ol>
-                    <li>Double-click <code>MacCleanup.app</code> to launch</li>
-                    <li>Your browser opens automatically at <code>http://localhost:5050</code></li>
-                    <li>Click <strong>"Preview Cleanup"</strong> to see suggested actions</li>
-                    <li>Select/deselect actions using checkboxes</li>
-                    <li>Click <strong>"Run Cleanup"</strong> to execute selected actions</li>
-                </ol>
-            </div>
-
-            <h3>🔄 Using MacCleanup in the Future</h3>
+            <h3>🔄 Using MacCleanup Later</h3>
             <div class="info-box">
                 <p><strong>Every time you want to clean up your files:</strong></p>
                 <ol>
-                    <li>Double-click <code>MacCleanup.app</code> in your Applications folder</li>
-                    <li>Your browser opens at <code>http://localhost:5050</code></li>
-                    <li>Click "Preview Cleanup" to see what needs organizing</li>
-                    <li>Review the suggestions</li>
-                    <li>Select the actions you want (using checkboxes)</li>
-                    <li>Click "Run Cleanup" to execute</li>
+                    <li>Open <code>MacCleanup.app</code> from your Applications folder</li>
+                    <li>Your browser opens automatically</li>
+                    <li>Click <strong>"Preview Cleanup"</strong> to see what needs organizing</li>
+                    <li>Select the actions you want and click <strong>"Run Cleanup"</strong></li>
                 </ol>
                 <p style="margin-top: 15px;"><strong>That's it!</strong> The app runs locally on your Mac - no internet connection needed, no server, just your files.</p>
             </div>
-
-            <h3>⏰ Optional: Automatic Weekly Cleanup</h3>
-            <p>To set up automatic cleanup every Monday at 9 AM:</p>
-            <code style="display: block; margin: 10px 0; padding: 10px; background: #f4f4f4; border-radius: 4px;">
-                cd /Applications/MacCleanup.app/Contents/Resources<br>
-                ./setup_scheduler.sh
-            </code>
-            <p style="margin-top: 15px; color: #666;">This is completely optional. You can always run the app manually instead.</p>
 
             <div class="features">
                 <div class="feature">
