@@ -1,0 +1,23 @@
+#!/bin/bash
+# Setup Route53 domain for computercleanup.staycurrentai.com
+
+echo "📋 Setting up Route53 domain: computercleanup.staycurrentai.com"
+echo ""
+echo "To set up the Route53 domain:"
+echo ""
+echo "1. Go to AWS Route53 Console: https://console.aws.amazon.com/route53/"
+echo ""
+echo "2. Select the hosted zone for: staycurrentai.com"
+echo ""
+echo "3. Click 'Create record':"
+echo "   - Record name: computercleanup"
+echo "   - Record type: A"
+echo "   - Value: 3.14.156.143"
+echo "   - TTL: 300 (or use default)"
+echo ""
+echo "4. Click 'Create record'"
+echo ""
+echo "5. Wait 2-5 minutes for DNS to propagate"
+echo ""
+echo "After DNS is set up, run the Apache configuration script:"
+echo "  ./configure_apache_subdomain.sh"
