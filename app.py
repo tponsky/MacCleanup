@@ -3,7 +3,7 @@ import os
 import json
 from pathlib import Path
 from datetime import datetime
-from flask import Flask, render_template_string, jsonify, request
+from flask import Flask, render_template_string, jsonify, request, make_response
 from cleanup_engine import CleanupEngine, format_size
 import config
 from setup_wizard import detect_dropbox, detect_external_drives
@@ -19,7 +19,7 @@ HTML_TEMPLATE = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacCleanup</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Using system fonts (SF Pro is built into macOS) -->
     <style>
         :root {
             --bg-primary: #1a1a2e;
@@ -436,6 +436,7 @@ HTML_TEMPLATE = '''
         <header>
             <h1>MacCleanup</h1>
             <div class="status-bar">
+                <a href="/setup" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 0.5rem; transition: all 0.2s;" onmouseover="this.style.color='var(--text-primary)'; this.style.borderColor='var(--accent)';" onmouseout="this.style.color='var(--text-secondary)'; this.style.borderColor='var(--border)';">⚙️ Setup</a>
                 <div class="status-indicator">
                     <div class="status-dot" id="dropbox-status"></div>
                     <span>Dropbox</span>
@@ -484,7 +485,7 @@ HTML_TEMPLATE = '''
             <div class="file-list" id="file-list">
                 <!-- Files will be listed here -->
             </div>
-            <div id="clarification-panel" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.75rem; border: 1px solid var(--border;">
+            <div id="clarification-panel" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.75rem; border: 1px solid var(--border);">
                 <h3 style="margin-bottom: 1rem; color: var(--warning);">❓ Need Your Input</h3>
                 <div id="clarification-questions"></div>
             </div>
@@ -879,7 +880,7 @@ SETUP_TEMPLATE = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacCleanup - Setup</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Using system fonts (SF Pro is built into macOS) -->
     <style>
         :root {
             --bg-primary: #1a1a2e;
@@ -1065,25 +1066,88 @@ SETUP_TEMPLATE = '''
     <div class="setup-container">
         <div class="setup-card">
             <h1>MacCleanup</h1>
-            <p class="subtitle">First-time Setup - Let's configure your file organization</p>
+            
+            <!-- Explanation Section -->
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.3rem; margin-bottom: 1rem; color: var(--text-primary);">Let's help clean up your computer and files</h2>
+                <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.5rem;">
+                    This app can look at all your files, suggest files that should be deleted, identify old versions that could be archived, 
+                    create folders with a better workflow, and come up with a storage strategy using your Desktop, external drives, and cloud storage.
+                </p>
+            </div>
+            
+            <p class="subtitle" style="margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 500;">Please answer these questions:</p>
             
             <form id="setupForm">
                 <div class="form-group">
-                    <label for="dropboxPath">Dropbox Folder</label>
-                    <input type="text" id="dropboxPath" name="dropboxPath" placeholder="/Users/YourName/Dropbox">
-                    <div class="form-help">MacCleanup will organize files into your Dropbox. Leave empty if you don't use Dropbox.</div>
-                    <div id="dropboxStatus"></div>
+                    <label for="cloudStorage">What is your preferred cloud storage?</label>
+                    <select id="cloudStorage" name="cloudStorage" style="width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); font-size: 1rem; font-family: inherit;">
+                        <option value="">Select your preferred cloud storage...</option>
+                        <option value="dropbox">Dropbox</option>
+                        <option value="icloud">iCloud Drive</option>
+                        <option value="google">Google Drive</option>
+                        <option value="onedrive">OneDrive</option>
+                        <option value="none">I don't use cloud storage</option>
+                    </select>
+                    <div class="form-help">We'll organize files into your preferred cloud storage location.</div>
+                </div>
+                
+                <div class="form-group" id="cloudPathGroup" style="display: none;">
+                    <label for="cloudPath">Cloud Storage Path</label>
+                    <input type="text" id="cloudPath" name="cloudPath" placeholder="Auto-detected or enter path manually">
+                    <div class="form-help" id="cloudPathHelp"></div>
+                    <div id="cloudPathStatus"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="ssdPath">External Drive (Optional)</label>
+                    <label for="existingStorage">What storage are you already using? (Select all that apply)</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="usingDropbox" name="existingStorage" value="dropbox">
+                            <label for="usingDropbox" style="margin: 0;">Dropbox</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="usingiCloud" name="existingStorage" value="icloud">
+                            <label for="usingiCloud" style="margin: 0;">iCloud Drive</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="usingGoogle" name="existingStorage" value="google">
+                            <label for="usingGoogle" style="margin: 0;">Google Drive</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="usingOneDrive" name="existingStorage" value="onedrive">
+                            <label for="usingOneDrive" style="margin: 0;">OneDrive</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="usingNone" name="existingStorage" value="none">
+                            <label for="usingNone" style="margin: 0;">None - I don't use cloud storage</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Do you have a solid state drive (SSD) that is always with you or able to be plugged in?</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <div class="checkbox-group" style="flex: 1;">
+                            <input type="radio" id="ssdYes" name="hasSSD" value="yes" style="width: 18px; height: 18px;">
+                            <label for="ssdYes" style="margin: 0;">Yes, I have an external SSD</label>
+                        </div>
+                        <div class="checkbox-group" style="flex: 1;">
+                            <input type="radio" id="ssdNo" name="hasSSD" value="no" style="width: 18px; height: 18px;">
+                            <label for="ssdNo" style="margin: 0;">No, I don't have an external SSD</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="ssdPathGroup" style="display: none;">
+                    <label for="ssdPath">Select your External SSD</label>
                     <select id="ssdPath" name="ssdPath">
                         <option value="">None - No external drive</option>
                     </select>
-                    <div class="form-help">Large files (videos) will be moved to your external drive. Only shown if a drive is detected.</div>
-                    <div class="checkbox-group" id="ssdAlwaysConnectedGroup" style="display: none;">
+                    <div class="form-help">Large files (videos, large projects) will be moved to your external SSD.</div>
+                    <div class="checkbox-group" id="ssdAlwaysConnectedGroup" style="display: none; margin-top: 0.5rem;">
                         <input type="checkbox" id="ssdAlwaysConnected" name="ssdAlwaysConnected">
-                        <label for="ssdAlwaysConnected" style="margin: 0;">Drive is always connected (storage only)</label>
+                        <label for="ssdAlwaysConnected" style="margin: 0;">This drive is always connected (storage only, not actively used)</label>
                     </div>
                     <div id="ssdStatus"></div>
                 </div>
@@ -1091,32 +1155,92 @@ SETUP_TEMPLATE = '''
                 <div class="error" id="error"></div>
                 <div class="loading" id="loading">Saving configuration...</div>
                 
-                <button type="submit" class="btn btn-primary" id="saveBtn">Save Configuration</button>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" id="saveBtn" style="flex: 1;">Save Configuration</button>
+                    <a href="/" class="btn" style="flex: 1; text-align: center; text-decoration: none; padding: 1rem 2rem; border: 1px solid var(--border); border-radius: 0.75rem; background: rgba(255,255,255,0.05); color: var(--text-primary); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">View Cleanup Dashboard</a>
+                </div>
+                
+                <div class="form-group" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                    <label>Default Page (after saving configuration)</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <div class="checkbox-group" style="flex: 1;">
+                            <input type="radio" id="defaultCleanup" name="defaultPage" value="cleanup" checked style="width: 18px; height: 18px;">
+                            <label for="defaultCleanup" style="margin: 0;">Cleanup Dashboard (default)</label>
+                        </div>
+                        <div class="checkbox-group" style="flex: 1;">
+                            <input type="radio" id="defaultSetup" name="defaultPage" value="setup" style="width: 18px; height: 18px;">
+                            <label for="defaultSetup" style="margin: 0;">This Setup Page</label>
+                        </div>
+                    </div>
+                    <div class="form-help">Choose which page the app opens to by default.</div>
+                </div>
             </form>
         </div>
     </div>
     
     <script>
-        // Auto-detect paths when page loads
-        async function detectPaths() {
+        // Handle cloud storage selection
+        document.getElementById('cloudStorage').addEventListener('change', function() {
+            const cloudPathGroup = document.getElementById('cloudPathGroup');
+            const cloudPath = document.getElementById('cloudPath');
+            const cloudPathHelp = document.getElementById('cloudPathHelp');
+            
+            if (this.value) {
+                cloudPathGroup.style.display = 'block';
+                detectCloudPath(this.value);
+            } else {
+                cloudPathGroup.style.display = 'none';
+            }
+        });
+        
+        // Handle SSD radio buttons
+        document.getElementById('ssdYes').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('ssdPathGroup').style.display = 'block';
+                detectSSD();
+            }
+        });
+        document.getElementById('ssdNo').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('ssdPathGroup').style.display = 'none';
+            }
+        });
+        
+        // Auto-detect cloud storage path
+        async function detectCloudPath(cloudType) {
             try {
                 const response = await fetch('/api/setup/detect');
                 const data = await response.json();
                 
-                // Set Dropbox path if detected
-                if (data.dropbox) {
-                    document.getElementById('dropboxPath').value = data.dropbox;
-                    document.getElementById('dropboxStatus').innerHTML = 
-                        '<div class="detected-path">✓ Detected: ' + data.dropbox + '</div>';
-                } else {
-                    document.getElementById('dropboxStatus').innerHTML = 
-                        '<div class="no-path">No Dropbox detected. You can enter the path manually or leave empty.</div>';
-                }
+                const cloudPath = document.getElementById('cloudPath');
+                const cloudPathHelp = document.getElementById('cloudPathHelp');
+                const cloudPathStatus = document.getElementById('cloudPathStatus');
                 
-                // Set external drives if detected
+                if (cloudType === 'dropbox' && data.dropbox) {
+                    cloudPath.value = data.dropbox;
+                    cloudPathHelp.textContent = 'Dropbox folder detected automatically.';
+                    cloudPathStatus.innerHTML = '<div class="detected-path">✓ Detected: ' + data.dropbox + '</div>';
+                } else if (cloudType === 'icloud') {
+                    cloudPath.value = data.icloud || (data.home + '/Library/Mobile Documents/com~apple~CloudDocs');
+                    cloudPathHelp.textContent = 'iCloud Drive path (default location).';
+                } else {
+                    cloudPath.value = '';
+                    cloudPathHelp.textContent = 'Please enter the path to your ' + cloudType + ' folder.';
+                }
+            } catch (error) {
+                console.error('Error detecting cloud path:', error);
+            }
+        }
+        
+        // Auto-detect external drives
+        async function detectSSD() {
+            try {
+                const response = await fetch('/api/setup/detect');
+                const data = await response.json();
+                
                 const ssdSelect = document.getElementById('ssdPath');
                 if (data.drives && data.drives.length > 0) {
-                    ssdSelect.innerHTML = '<option value="">None - No external drive</option>';
+                    ssdSelect.innerHTML = '<option value="">Select your external SSD...</option>';
                     data.drives.forEach(drive => {
                         const option = document.createElement('option');
                         option.value = '/Volumes/' + drive;
@@ -1125,21 +1249,31 @@ SETUP_TEMPLATE = '''
                     });
                     document.getElementById('ssdAlwaysConnectedGroup').style.display = 'flex';
                 } else {
-                    ssdSelect.innerHTML = '<option value="">None - No external drive detected</option>';
+                    ssdSelect.innerHTML = '<option value="">No external drives detected. Make sure your SSD is plugged in.</option>';
                     document.getElementById('ssdAlwaysConnectedGroup').style.display = 'none';
                 }
             } catch (error) {
-                console.error('Error detecting paths:', error);
+                console.error('Error detecting SSD:', error);
             }
+        }
+        
+        // Auto-detect paths when page loads
+        async function detectPaths() {
+            await detectSSD();
         }
         
         // Handle form submission
         document.getElementById('setupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const dropboxPath = document.getElementById('dropboxPath').value.trim();
+            const cloudStorage = document.getElementById('cloudStorage').value;
+            const cloudPath = document.getElementById('cloudPath').value.trim();
             const ssdPath = document.getElementById('ssdPath').value;
             const ssdAlwaysConnected = document.getElementById('ssdAlwaysConnected').checked;
+            const defaultPage = document.querySelector('input[name="defaultPage"]:checked').value;
+            
+            // Get existing storage checkboxes
+            const existingStorage = Array.from(document.querySelectorAll('input[name="existingStorage"]:checked')).map(cb => cb.value);
             
             const errorDiv = document.getElementById('error');
             const loadingDiv = document.getElementById('loading');
@@ -1156,17 +1290,27 @@ SETUP_TEMPLATE = '''
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        dropbox_root: dropboxPath || null,
+                        cloud_storage: cloudStorage,
+                        cloud_path: cloudPath || null,
+                        dropbox_root: (cloudStorage === 'dropbox' && cloudPath) ? cloudPath : null,
                         ssd_root: ssdPath || null,
                         ssd_always_connected: ssdAlwaysConnected,
+                        existing_storage: existingStorage,
+                        default_page: defaultPage,
                     }),
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Redirect to main dashboard
-                    window.location.href = '/';
+                    // Redirect based on default page preference
+                    if (defaultPage === 'setup') {
+                        alert('Configuration saved successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Configuration saved successfully! Redirecting to cleanup dashboard...');
+                        window.location.href = '/';
+                    }
                 } else {
                     throw new Error(data.message || 'Failed to save configuration');
                 }
@@ -1178,8 +1322,11 @@ SETUP_TEMPLATE = '''
             }
         });
         
-        // Detect paths on page load
+        // Detect paths on page load (but don't auto-save!)
         detectPaths();
+        
+        // Prevent any accidental auto-submission
+        console.log('Setup wizard loaded - waiting for user to click Save');
     </script>
 </body>
 </html>
@@ -1188,10 +1335,45 @@ SETUP_TEMPLATE = '''
 
 @app.route('/')
 def index():
-    # Check if user_config.json exists - show setup page if not
+    # Check if configured - redirect to setup if not
     USER_CONFIG_FILE = Path(__file__).parent / "user_config.json"
     if not USER_CONFIG_FILE.exists():
-        return render_template_string(SETUP_TEMPLATE)
+        # Redirect to setup page on first launch
+        return make_response(render_template_string(SETUP_TEMPLATE), 200, {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        })
+    
+    # Check default page preference
+    try:
+        with open(USER_CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+            default_page = config.get('default_page', 'cleanup')
+            if default_page == 'setup':
+                return make_response(render_template_string(SETUP_TEMPLATE), 200, {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                })
+    except:
+        pass
+    
+    # Show main cleanup page
+    return render_template_string(HTML_TEMPLATE)
+
+@app.route('/setup')
+def setup():
+    # Always available setup page - users can configure anytime
+    response = make_response(render_template_string(SETUP_TEMPLATE))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/cleanup')
+def cleanup():
+    # Main cleanup page (alternative route)
     return render_template_string(HTML_TEMPLATE)
 
 
@@ -1267,11 +1449,16 @@ def api_preview():
 
 @app.route('/api/setup/detect')
 def api_setup_detect():
-    """Detect Dropbox and external drives for setup"""
+    """Detect Dropbox, iCloud, and external drives for setup"""
+    from pathlib import Path
     dropbox_path = detect_dropbox()
+    home = Path.home()
+    icloud_path = home / "Library" / "Mobile Documents" / "com~apple~CloudDocs"
     drives = detect_external_drives()
     return jsonify({
         "dropbox": str(dropbox_path) if dropbox_path else None,
+        "icloud": str(icloud_path) if icloud_path.exists() else None,
+        "home": str(home),
         "drives": drives,
     })
 
@@ -1280,10 +1467,26 @@ def api_setup_detect():
 def api_setup_save():
     """Save user configuration"""
     data = request.get_json() or {}
+    
+    # Map cloud storage to path
+    cloud_storage = data.get("cloud_storage")
+    cloud_path = data.get("cloud_path")
+    dropbox_root = data.get("dropbox_root")
+    
+    # Use cloud_path if provided, otherwise use dropbox_root for backward compatibility
+    if cloud_storage == 'dropbox' and cloud_path:
+        dropbox_root = cloud_path
+    elif cloud_storage == 'icloud' and cloud_path:
+        dropbox_root = cloud_path  # Store in same field for now
+    
     config_data = {
-        "dropbox_root": data.get("dropbox_root"),
+        "cloud_storage": cloud_storage,
+        "cloud_path": cloud_path,
+        "dropbox_root": dropbox_root,
         "ssd_root": data.get("ssd_root"),
         "ssd_always_connected": data.get("ssd_always_connected", False),
+        "existing_storage": data.get("existing_storage", []),
+        "default_page": data.get("default_page", "cleanup"),
     }
     
     USER_CONFIG_FILE = Path(__file__).parent / "user_config.json"
