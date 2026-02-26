@@ -1,6 +1,8 @@
 """MacCleanup - Web-based file cleanup tool for macOS"""
 import os
 import json
+import sys
+import socket
 from pathlib import Path
 from datetime import datetime
 from flask import Flask, render_template_string, jsonify, request, make_response
@@ -1533,4 +1535,34 @@ if __name__ == '__main__':
     print("🧹 MacCleanup is running!")
     print("   Open http://localhost:5050 in your browser")
     print("   Press Ctrl+C to stop")
+    
+    # Open browser automatically after a short delay (only on macOS)
+    if sys.platform == 'darwin':
+        import threading
+        import webbrowser
+        import time
+        
+        def open_browser():
+            # Wait for Flask to start
+            time.sleep(2)
+            # Check if server is ready
+            max_attempts = 30
+            for attempt in range(max_attempts):
+                try:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.settimeout(0.5)
+                    result = s.connect_ex(('127.0.0.1', 5050))
+                    s.close()
+                    if result == 0:
+                        # Server is ready, open browser
+                        webbrowser.open('http://localhost:5050')
+                        break
+                except:
+                    pass
+                time.sleep(0.5)
+        
+        # Start browser opener in background thread
+        browser_thread = threading.Thread(target=open_browser, daemon=True)
+        browser_thread.start()
+    
     app.run(host='127.0.0.1', port=5050, debug=False)

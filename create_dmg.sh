@@ -1,54 +1,89 @@
 #!/bin/bash
-# Create DMG installer for MacCleanup
-# Similar to MOV-to-MP4 converter packaging
+# Create DMG installer for MacCleanup using py2app
+# Bundles Python and all dependencies into standalone .app bundle
+# Users don't need Python installed - everything is included!
 
 APP_NAME="MacCleanup"
 VERSION="1.0"
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
+BUILD_DIR="build"
+DIST_DIR="dist"
 TEMP_DIR="/tmp/${APP_NAME}_dmg"
-APP_BUNDLE="${TEMP_DIR}/${APP_NAME}.app"
-APP_CONTENTS="${APP_BUNDLE}/Contents"
-APP_MACOS="${APP_CONTENTS}/MacOS"
-APP_RESOURCES="${APP_CONTENTS}/Resources"
 
-echo "📦 Creating MacCleanup DMG installer..."
+echo "📦 Creating MacCleanup DMG installer (standalone bundle)..."
 
 # Clean up
+rm -rf "${BUILD_DIR}"
+rm -rf "${DIST_DIR}"
 rm -rf "${TEMP_DIR}"
 rm -f "${DMG_NAME}"
 
-# Create directory structure
-mkdir -p "${APP_MACOS}"
-mkdir -p "${APP_RESOURCES}"
-
-# Create the main executable script
-cat > "${APP_MACOS}/MacCleanup" << 'SCRIPT'
-#!/bin/bash
-# MacCleanup Launcher
-APP_DIR="$(cd "$(dirname "$0")/../Resources" && pwd)"
-cd "$APP_DIR"
-
-# Check if first run
-if [ ! -d "venv" ]; then
-    osascript -e 'display notification "Setting up MacCleanup (first time only)..." with title "MacCleanup"'
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -q --upgrade pip
-    pip install -q -r requirements.txt
-else
-    source venv/bin/activate
+# Check if py2app is installed
+echo "Checking for py2app..."
+if ! python3 -c "import py2app" 2>/dev/null; then
+    echo "Installing py2app..."
+    pip3 install py2app --quiet || {
+        echo "❌ Error: Failed to install py2app"
+        echo "Please install it manually: pip3 install py2app"
+        exit 1
+    }
 fi
 
-# Open browser after delay
-(sleep 2 && open "http://localhost:5050") &
+# Check if we have an icon
+ICON_PATH=""
+if [ -f "${APP_NAME}.icns" ]; then
+    ICON_PATH="${APP_NAME}.icns"
+    echo "✅ Found app icon: ${ICON_PATH}"
+elif [ -f "AppIcon.icns" ]; then
+    ICON_PATH="AppIcon.icns"
+    echo "✅ Found app icon: ${ICON_PATH}"
+else
+    echo "⚠️  No icon file found - will use system default"
+fi
 
-# Run the app
-python3 app.py
-SCRIPT
+# Update setup.py with icon path if available
+if [ -n "${ICON_PATH}" ]; then
+    # Update setup.py to include icon
+    python3 << EOF
+import re
 
-chmod +x "${APP_MACOS}/MacCleanup"
+with open('setup.py', 'r') as f:
+    content = f.read()
 
-# Create app icon with broom emoji
+# Update iconfile if it exists
+if "'iconfile': None" in content:
+    content = content.replace("'iconfile': None", f"'iconfile': '{ICON_PATH}'")
+elif "'iconfile':" not in content:
+    # Add iconfile to OPTIONS dict
+    content = content.replace("'packages':", f"'iconfile': '{ICON_PATH}',\n    'packages':")
+
+with open('setup.py', 'w') as f:
+    f.write(content)
+EOF
+fi
+
+# Build the app bundle using py2app
+echo "Building standalone app bundle with py2app..."
+echo "This bundles Python and all dependencies - may take a few minutes..."
+
+python3 setup.py py2app --no-chdir || {
+    echo "❌ Error: Failed to build app bundle"
+    exit 1
+}
+
+# Find the built app bundle
+if [ -d "${DIST_DIR}/${APP_NAME}.app" ]; then
+    APP_BUNDLE="${DIST_DIR}/${APP_NAME}.app"
+    echo "✅ App bundle created: ${APP_BUNDLE}"
+else
+    echo "❌ Error: App bundle not found in ${DIST_DIR}/"
+    exit 1
+fi
+
+APP_CONTENTS="${APP_BUNDLE}/Contents"
+APP_RESOURCES="${APP_CONTENTS}/Resources"
+
+# Create app icon with broom emoji (py2app may not have included it)
 echo "Creating app icon..."
 ICON_DIR="${APP_RESOURCES}/icon.iconset"
 mkdir -p "${ICON_DIR}"
@@ -154,57 +189,16 @@ if command -v iconutil &> /dev/null && [ -d "${ICON_DIR}" ] && [ "$(ls -A ${ICON
     iconutil -c icns "${ICON_DIR}" -o "${APP_RESOURCES}/AppIcon.icns" 2>/dev/null || echo "⚠️  Icon creation skipped"
     rm -rf "${ICON_DIR}"
     echo "✅ App icon created"
+    # Update Info.plist to reference the icon
+    /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile AppIcon" "${APP_CONTENTS}/Info.plist" 2>/dev/null || true
 else
     echo "⚠️  Icon creation skipped - using system default"
 fi
 
-# Create Info.plist with icon reference
-cat > "${APP_CONTENTS}/Info.plist" << 'PLIST'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>MacCleanup</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.maccleanup.app</string>
-    <key>CFBundleName</key>
-    <string>MacCleanup</string>
-    <key>CFBundleVersion</key>
-    <string>1.0</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>10.13</string>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2025</string>
-</dict>
-</plist>
-PLIST
-
-# Copy all project files to Resources
-echo "Copying files..."
-cp -r /Users/toddponskymd/CursorProjects/MacCleanup/* "${APP_RESOURCES}/" 2>/dev/null
-# Clean up files that shouldn't be in the app bundle
-rm -rf "${APP_RESOURCES}/.git" 2>/dev/null
-rm -rf "${APP_RESOURCES}/venv" 2>/dev/null
-rm -f "${APP_RESOURCES}/*.dmg" 2>/dev/null
-rm -f "${APP_RESOURCES}/*.zip" 2>/dev/null
-rm -rf "${APP_RESOURCES}/dmg_source" 2>/dev/null
-# IMPORTANT: Remove user_config.json so setup wizard shows on first run
-echo "Removing user_config.json to ensure setup wizard shows on first run..."
-if [ -f "${APP_RESOURCES}/user_config.json" ]; then
-    rm -f "${APP_RESOURCES}/user_config.json"
-    echo "✅ Removed user_config.json"
-else
-    echo "✅ user_config.json already removed (good!)"
-fi
+# Create DMG source directory
+echo "Preparing DMG layout..."
+mkdir -p "${TEMP_DIR}"
+cp -R "${APP_BUNDLE}" "${TEMP_DIR}/"
 
 # Create professional DMG layout
 echo "Setting up professional DMG layout..."

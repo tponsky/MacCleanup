@@ -29,3 +29,6 @@ Thumbs.db
 # App runtime
 /tmp/
 *.pyc
+user_config.json
+*.dmg
+.icons/
